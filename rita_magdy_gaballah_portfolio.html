@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rita Magdy Gaballah | Beauty, Commercial & Jewellery Model</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Official modelling portfolio of Rita Magdy Gaballah. Beauty, Commercial, Fine Jewellery, Fitness & Educational Marketing Model based in Smouha, Alexandria, Egypt. Available for Cairo relocation.">
+    <meta name="keywords" content="Rita Magdy Gaballah, Model Alexandria Egypt, Beauty Model Cairo, Jewellery Model Egypt, Commercial Model Egypt, Egyptian Models Portfolio">
+    <meta property="og:title" content="Rita Magdy Gaballah | Professional Model Portfolio">
+    <meta property="og:description" content="Beauty, Commercial & Jewellery Model based in Alexandria, Egypt. Available for brand campaigns and bookings.">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts: Cormorant Garamond & Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            champagne: '#f8f4ee',
+                            ivory: '#fdfbf7',
+                            beige: '#e8dfd8',
+                            gold: '#c5a059',
+                            goldlight: '#dfc185',
+                            charcoal: '#1a1a1a',
+                            muted: '#726d67'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                        sans: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- React, ReactDOM, Babel & Lucide Icons -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #fdfbf7;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+        .font-serif {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+        }
+        .glass-header {
+            background: rgba(253, 251, 247, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #a37c3f 0%, #c5a059 50%, #e3cb96 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .editorial-border {
+            border: 1px solid rgba(197, 160, 89, 0.25);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f4ee;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c5a059;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="selection:bg-brand-gold selection:text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Default Editorial Image Collections (High aesthetic fallback fashion placeholders)
+        const DEFAULT_IMAGES = {
+            hero: "Makeup/croped2.jpeg",
+            makeup: [
+                
+                  "Makeup/3.jpeg",
+                   "Makeup/croped.jpeg",
+                    "Makeup/croped2.jpeg",
+                    "Makeup/photo3.jpeg",
+                    "Makeup/croped5.jpeg",
+                    "Makeup/4.jpeg",
+               
+            ],
+            videos: [
+                { title: "Makeup & Gloss Reel", duration: "0:30", thumb: "Makeup/6.mp4" },
+                { title: "Diamond Jewellery Movement", duration: "0:45", thumb: "Makeup/adding.mp4" },
+                { title: "Commercial Studio Pose", duration: "0:25", thumb: "Makeup/moving.mp4" }
+            ],
+            headshots: [
+                "photos/front.png", // Front-facing
+                
+                "photos/smile.png" , // Profile
+                "photos/side.png", // Three-quarter
+            ],
+            fullBody: [
+                "photos/sidefull.png",
+                "photos/brightsmile.png",
+                "photos/fullCroped.png"
+            ],
+            natural: [
+                "jewellery/one.jpeg",
+                  "jewellery/two.jpeg", 
+                   "jewellery/three.jpeg",
+               
+            ]
+
+            
+        };
+
+        function App() {
+            // Photos State (Persisted in localStorage for easy customization)
+            const [photos, setPhotos] = useState(() => {
+                const saved = localStorage.getItem('rita_portfolio_photos');
+                return saved ? JSON.parse(saved) : DEFAULT_IMAGES;
+            });
+
+            // Navigation & Drawer States
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [customizerOpen, setCustomizerOpen] = useState(false);
+            const [guideModalOpen, setGuideModalOpen] = useState(false);
+
+            // Lightbox Modal State
+            const [lightbox, setLightbox] = useState({ open: false, images: [], index: 0, title: '' });
+
+            // Video Player Modal State
+            const [videoModal, setVideoModal] = useState({ open: false, title: '' });
+
+            // Form Data & Toast Feedback
+            const [formData, setFormData] = useState({
+                name: '',
+                company: '',
+                email: '',
+                phone: '',
+                category: 'Makeup & Beauty',
+                date: '',
+                duration: '3 Hours',
+                budget: '2000',
+                details: ''
+            });
+            const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+            useEffect(() => {
+                localStorage.setItem('rita_portfolio_photos', JSON.stringify(photos));
+            }, [photos]);
+
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+
+            const showToast = (message, type = 'success') => {
+                setToast({ show: true, message, type });
+                setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 4000);
+            };
+
+            const openLightbox = (imagesList, startIndex = 0, title = 'Gallery Preview') => {
+                setLightbox({ open: true, images: imagesList, index: startIndex, title });
+            };
+
+            const nextLightbox = () => {
+                setLightbox(prev => ({ ...prev, index: (prev.index + 1) % prev.images.length }));
+            };
+
+            const prevLightbox = () => {
+                setLightbox(prev => ({ ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length }));
+            };
+
+            // Booking Form Handler
+            const handleFormSubmit = (e) => {
+                e.preventDefault();
+                if (!formData.name || !formData.email || !formData.phone) {
+                    showToast('Please fill in all required fields.', 'error');
+                    return;
+                }
+
+                // Construct formatted WhatsApp message
+                const text = `Hello Rita,%0A%0AI would like to submit a modelling enquiry:%0A` +
+                    `- *Client Name*: ${encodeURIComponent(formData.name)}%0A` +
+                    `- *Company/Brand*: ${encodeURIComponent(formData.company || 'N/A')}%0A` +
+                    `- *Modelling Type*: ${encodeURIComponent(formData.category)}%0A` +
+                    `- *Preferred Date*: ${encodeURIComponent(formData.date || 'To be discussed')}%0A` +
+                    `- *Duration*: ${encodeURIComponent(formData.duration)}%0A` +
+                    `- *Budget*: EGP ${encodeURIComponent(formData.budget)}%0A` +
+                    `- *Phone*: ${encodeURIComponent(formData.phone)}%0A` +
+                    `- *Details*: ${encodeURIComponent(formData.details || 'None provided')}`;
+
+                const whatsappUrl = `https://wa.me/201060542538?text=${text}`;
+                
+                showToast('Booking enquiry generated! Redirecting to WhatsApp...', 'success');
+                setTimeout(() => {
+                    window.open(whatsappUrl, '_blank');
+                }, 1200);
+            };
+
+            const prefillCategory = (catName) => {
+                setFormData(prev => ({ ...prev, category: catName }));
+                const contactSec = document.getElementById('contact');
+                if (contactSec) contactSec.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            const resetPhotosToDefault = () => {
+                setPhotos(DEFAULT_IMAGES);
+                localStorage.removeItem('rita_portfolio_photos');
+                showToast('All photographs reset to default placeholders.');
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col bg-brand-ivory text-brand-charcoal relative">
+                    
+                    {/* TOAST NOTIFICATION */}
+                    {toast.show && (
+                        <div className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-medium transition-all transform duration-300 ${toast.type === 'error' ? 'bg-red-900 text-white' : 'bg-brand-charcoal text-brand-champagne border border-brand-gold/40'}`}>
+                            <i data-lucide={toast.type === 'error' ? 'alert-circle' : 'check-circle-2'} className="w-5 h-5 text-brand-gold"></i>
+                            <span>{toast.message}</span>
+                        </div>
+                    )}
+
+                    {/* TOP NAVIGATION BAR */}
+                    <header className="sticky top-0 z-40 glass-header border-b border-brand-beige/60 transition-all duration-300">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                            <a href="#" className="flex flex-col group">
+                                <span className="font-serif text-2xl tracking-[0.2em] font-semibold text-brand-charcoal group-hover:text-brand-gold transition-colors">RITA MAGDY</span>
+                                <span className="text-[9px] uppercase tracking-[0.3em] text-brand-muted -mt-1">Modelling Portfolio</span>
+                            </a>
+
+                            {/* Desktop Navigation Links */}
+                            <nav className="hidden lg:flex items-center space-x-7 text-xs uppercase tracking-[0.18em] font-medium text-brand-charcoal/80">
+                                <a href="#home" className="hover:text-brand-gold transition-colors">Home</a>
+                                <a href="#makeup" className="hover:text-brand-gold transition-colors">Makeup Shooting</a>
+                                <a href="#headshots" className="hover:text-brand-gold transition-colors">Headshots</a>
+                                <a href="#fullbody" className="hover:text-brand-gold transition-colors">Full-Body</a>
+{/* <a href="#natural" className="hover:text-brand-gold transition-colors">Jewellery</a> */}                                
+                                <a href="#categories" className="hover:text-brand-gold transition-colors">Modelling Categories</a>
+                                <a href="#rates" className="hover:text-brand-gold transition-colors">Rate Card</a>
+                                <a href="#contact" className="hover:text-brand-gold transition-colors">Contact</a>
+                            </nav>
+
+                          
+
+                            {/* Mobile Hamburger Button */}
+                            <div className="flex lg:hidden items-center space-x-2">
+                                <button 
+                                    onClick={() => setCustomizerOpen(true)}
+                                    className="p-2 rounded-lg bg-brand-champagne text-brand-charcoal text-xs"
+                                    title="Photos"
+                                >
+                                    <i data-lucide="image" className="w-5 h-5 text-brand-gold"></i>
+                                </button>
+                                <button 
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+                                    className="p-2 text-brand-charcoal hover:text-brand-gold focus:outline-none"
+                                    aria-label="Toggle Menu"
+                                >
+                                    <i data-lucide={mobileMenuOpen ? "x" : "menu"} className="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Mobile Drawer */}
+                        {mobileMenuOpen && (
+                            <div className="lg:hidden bg-brand-ivory/98 border-b border-brand-beige px-6 py-6 space-y-4 shadow-xl">
+                                <div className="flex flex-col space-y-3 text-xs uppercase tracking-widest font-medium text-brand-charcoal">
+                                    <a href="#home" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-brand-beige/40">Home</a>
+                                    <a href="#makeup" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-brand-beige/40">Makeup Shooting</a>
+                                    <a href="#headshots" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-brand-beige/40">Headshots</a>
+                                    <a href="#fullbody" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-brand-beige/40">Full-Body</a>
+                                    <a href="#natural" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-brand-beige/40">Natural</a>
+                                    <a href="#categories" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-brand-beige/40">Modelling Categories</a>
+                                    <a href="#rates" onClick={() => setMobileMenuOpen(false)} className="py-2 border-b border-brand-beige/40">Rate Card</a>
+                                    <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="py-2">Contact</a>
+                                </div>
+                                <div className="pt-2 flex flex-col space-y-2">
+                                    <a 
+                                        href="#contact" 
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="w-full text-center py-3 bg-brand-charcoal text-brand-ivory text-xs uppercase tracking-widest font-medium rounded-lg"
+                                    >
+                                        Book Model
+                                    </a>
+                                    <button 
+                                        onClick={() => { setMobileMenuOpen(false); setGuideModalOpen(true); }}
+                                        className="w-full text-center py-2 text-xs text-brand-gold underline"
+                                    >
+                                        How to Publish & Edit Site
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </header>
+
+                    {/* SECTION 1: HERO & PERSONAL PROFILE */}
+                    <section id="home" className="relative py-12 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                            
+                            {/* LEFT COLUMN: INFORMATION */}
+                            <div className="lg:col-span-7 space-y-8 order-2 lg:order-1">
+                                <div className="space-y-3">
+                                    <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-champagne border border-brand-gold/30 text-xs tracking-wider uppercase text-brand-muted font-medium">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span>Available for Bookings & Campaigns</span>
+                                    </div>
+                                    <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal tracking-wide text-brand-charcoal leading-[1.1]">
+                                        RITA MAGDY GABALLAH
+                                    </h1>
+                                    <p className="text-sm sm:text-base tracking-[0.2em] font-medium text-brand-gold uppercase">
+                                        Beauty, Commercial & Jewellery Model
+                                    </p>
+                                </div>
+
+                                {/* Vital Specs Box */}
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-5 rounded-2xl bg-brand-champagne/70 border border-brand-beige">
+                                    <div className="p-2">
+                                        <span className="block text-[10px] uppercase tracking-widest text-brand-muted">Location</span>
+                                        <span className="text-xs sm:text-sm font-semibold text-brand-charcoal">Smouha, Alexandria</span>
+                                    </div>
+                                    <div className="p-2">
+                                        <span className="block text-[10px] uppercase tracking-widest text-brand-muted">Date of Birth</span>
+                                        <span className="text-xs sm:text-sm font-semibold text-brand-charcoal">Born 26 Dec 2000</span>
+                                    </div>
+                                    <div className="p-2">
+                                        <span className="block text-[10px] uppercase tracking-widest text-brand-muted">Height / Weight</span>
+                                        <span className="text-xs sm:text-sm font-semibold text-brand-charcoal">164 cm / 60 kg</span>
+                                    </div>
+                                    <div className="p-2">
+                                        <span className="block text-[10px] uppercase tracking-widest text-brand-muted">Hair</span>
+                                        <span className="text-xs sm:text-sm font-semibold text-brand-charcoal">Long blonde hair</span>
+                                    </div>
+                                    <div className="p-2 col-span-2">
+                                        <span className="block text-[10px] uppercase tracking-widest text-brand-gold font-medium">Relocation Status</span>
+                                        <span className="text-xs sm:text-sm font-medium text-brand-charcoal flex items-center gap-1">
+                                            <i data-lucide="map-pin" className="w-3.5 h-3.5 text-brand-gold inline"></i>
+                                            Ready to relocate to Cairo, Egypt
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Exact Professional Intro */}
+                                <div className="space-y-4 text-brand-charcoal/85 leading-relaxed text-sm sm:text-base border-l-2 border-brand-gold/60 pl-5 italic font-serif">
+                                    <p>
+                                        “I am Rita Magdy Gaballah, a beauty and commercial model based in Alexandria, Egypt, with an interest in makeup, diamond and jewellery campaigns, fitness, food advertising, and educational marketing. I am building my modelling portfolio and seeking opportunities to collaborate with brands, creative teams, photographers, and advertising agencies. I am also ready to relocate to Cairo for suitable modelling assignments and professional offers.”
+                                    </p>
+                                </div>
+
+                                {/* Call To Action Buttons */}
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+                                    <a 
+                                        href="#makeup" 
+                                        className="px-8 py-4 bg-brand-charcoal text-brand-ivory text-xs uppercase tracking-[0.2em] font-medium rounded-xl hover:bg-brand-gold hover:text-brand-charcoal transition-all text-center shadow-md flex items-center justify-center space-x-2"
+                                    >
+                                        <span>VIEW MY PORTFOLIO</span>
+                                        <i data-lucide="arrow-down-right" className="w-4 h-4"></i>
+                                    </a>
+                                    <a 
+                                        href="#contact" 
+                                        className="px-8 py-4 bg-transparent border border-brand-charcoal text-brand-charcoal text-xs uppercase tracking-[0.2em] font-medium rounded-xl hover:bg-brand-champagne transition-all text-center flex items-center justify-center space-x-2"
+                                    >
+                                        <i data-lucide="mail" className="w-4 h-4 text-brand-gold"></i>
+                                        <span>CONTACT ME FOR BOOKINGS</span>
+                                    </a>
+                                </div>
+
+                                {/* Direct Contact Quick Bar */}
+                                <div className="pt-4 flex items-center space-x-6 text-xs text-brand-muted">
+                                    <a href="https://wa.me/201060542538" target="_blank" rel="noreferrer" className="flex items-center space-x-2 hover:text-emerald-700 transition-colors">
+                                        <i data-lucide="message-circle" className="w-4 h-4 text-emerald-600"></i>
+                                        <span>01060542538 (WhatsApp)</span>
+                                    </a>
+                                    <a href="mailto:ritamagdy99@gmail.com" className="flex items-center space-x-2 hover:text-brand-gold transition-colors">
+                                        <i data-lucide="mail" className="w-4 h-4 text-brand-gold"></i>
+                                        <span>ritamagdy99@gmail.com</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {/* RIGHT COLUMN: EDITORIAL IMAGE PORTRAIT COMPOSITION */}
+                            <div className="lg:col-span-5 order-1 lg:order-2">
+                                <div className="relative mx-auto max-w-md lg:max-w-none">
+                                    {/* Decorative Frame Elements */}
+                                    <div className="absolute -inset-3 rounded-2xl border border-brand-gold/40 transform rotate-1 pointer-events-none"></div>
+                                    <div className="absolute -inset-3 rounded-2xl border border-brand-beige/80 transform -rotate-1 pointer-events-none"></div>
+                                    
+                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-brand-beige group cursor-pointer" onClick={() => openLightbox([photos.hero], 0, "Rita Magdy Gaballah - Main Portrait")}>
+                                        <img 
+                                            src={photos.hero} 
+                                            alt="Rita Magdy Gaballah - Beauty and Commercial Model" 
+                                            className="w-full h-[520px] sm:h-[620px] object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                                            onError={(e) => { e.target.src = DEFAULT_IMAGES.hero; }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                                            <div className="text-white">
+                                                <p className="text-xs uppercase tracking-widest text-brand-gold font-medium">Click to Enlarge</p>
+                                                <p className="font-serif text-lg">Rita Magdy Gaballah</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Small Editorial Badge */}
+                                    <div className="absolute -bottom-6 -left-6 bg-brand-ivory p-4 rounded-xl shadow-xl border border-brand-beige hidden sm:flex items-center space-x-3">
+                                        <div className="w-10 h-10 rounded-full bg-brand-champagne flex items-center justify-center text-brand-gold">
+                                            <i data-lucide="sparkles" className="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold text-brand-charcoal">Commercial Portfolio</p>
+                                            <p className="text-[10px] text-brand-muted uppercase tracking-wider">Beauty • Diamond • Fitness</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    {/* SECTION 2: MAKEUP SHOOTING */}
+                    <section id="makeup" className="py-16 sm:py-24 bg-brand-champagne/40 border-t border-b border-brand-beige/60">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
+                                <span className="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium">Beauty & Artistry</span>
+                                <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-charcoal">MAKEUP SHOOTING</h2>
+                                <p className="text-sm sm:text-base text-brand-muted italic font-serif">
+                                    “Beauty looks, makeup artistry and editorial portraits.”
+                                </p>
+                            </div>
+
+                            {/* 6 Image Grid (3 Columns x 2 Rows Desktop) */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                                {photos.makeup.map((imgUrl, idx) => (
+                                    <div 
+                                        key={idx}
+                                        onClick={() => openLightbox(photos.makeup, idx, `Makeup Shooting - Look ${idx + 1}`)}
+                                        className="group relative rounded-xl overflow-hidden bg-brand-beige aspect-[3/4] cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300"
+                                    >
+                                        <img 
+                                            src={imgUrl} 
+                                            alt={`Rita Magdy Gaballah - Makeup Shooting Look ${idx + 1}`} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => { e.target.src = DEFAULT_IMAGES.makeup[idx]; }}
+                                        />
+                                        <div className="absolute inset-0 bg-brand-charcoal/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <span className="p-3 rounded-full bg-white/90 text-brand-charcoal shadow-lg">
+                                                <i data-lucide="maximize-2" className="w-5 h-5"></i>
+                                            </span>
+                                        </div>
+                                        <div className="absolute bottom-3 left-3 bg-brand-charcoal/70 backdrop-blur-sm text-brand-ivory text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                            Look #{idx + 1}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                        {/* THIRD ROW: 3 VIDEO CARDS */}
+<div className="mt-12 pt-10 border-t border-brand-beige">
+    <div className="flex items-center space-x-2 mb-6">
+        <i data-lucide="video" className="w-5 h-5 text-brand-gold"></i>
+        <h3 className="font-serif text-xl font-medium text-brand-charcoal">Makeup & Beauty Video Reels</h3>
+    </div>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {photos.videos.map((vid, idx) => (
+            <div 
+                key={idx} 
+                onClick={() => setVideoModal({ open: true, title: vid.title })}
+                className="group relative rounded-xl overflow-hidden bg-black text-white aspect-[9/16] max-h-[500px] mx-auto w-full cursor-pointer shadow-md hover:shadow-xl transition-all"
+            >
+                {vid.thumb.endsWith('.mp4') ? (
+                    <video 
+                        src={vid.thumb} 
+                        autoPlay 
+                        muted 
+                        loop 
+                        playsInline 
+                        className="w-full h-full object-contain"
+                    />
+                ) : (
+                    <img 
+                        src={vid.thumb} 
+                        alt={vid.title} 
+                        className="w-full h-full object-contain" 
+                    />
+                )}
+                
+                {/* Title & Duration Bar at the bottom */}
+                <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex justify-between items-end">
+                    <span className="text-xs font-medium text-white">{vid.title}</span>
+                    <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded text-brand-gold font-mono">{vid.duration}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+                        </div>
+                    </section>
+
+                    {/* SECTION 3: HEADSHOTS */}
+                    <section id="headshots" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
+                            <span className="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium">Facial Expressions & Features</span>
+                            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-charcoal">HEADSHOTS</h2>
+                            <p className="text-sm sm:text-base text-brand-muted italic font-serif">
+                                “Portrait photography highlighting facial features, expressions and natural beauty.”
+                            </p>
+                        </div>
+
+                        {/* Exactly 3 Image Cards Horizontal Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[
+                                { title: "Front-Facing Portrait", subtitle: "Direct facial symmetry & clear gaze" },
+                                { title: "Three-Quarter Portrait", subtitle: "Jawline emphasis & subtle angles" },
+                                { title: "Side Profile", subtitle: "Facial contouring & profile silhouette" }
+                            ].map((spec, idx) => (
+                                <div key={idx} className="space-y-3 group">
+                                    <div 
+                                        onClick={() => openLightbox(photos.headshots, idx, `Headshot - ${spec.title}`)}
+                                        className="relative rounded-xl overflow-hidden bg-brand-beige aspect-[4/5] cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300"
+                                    >
+                                        <img 
+                                            src={photos.headshots[idx]} 
+                                            alt={`Rita Magdy Gaballah Headshot - ${spec.title}`} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => { e.target.src = DEFAULT_IMAGES.headshots[idx]; }}
+                                        />
+                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <span className="p-3 rounded-full bg-white text-brand-charcoal shadow-lg">
+                                                <i data-lucide="zoom-in" className="w-5 h-5"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="pt-1 text-center">
+                                        <h3 className="font-serif text-lg font-medium text-brand-charcoal">{spec.title}</h3>
+                                        <p className="text-xs text-brand-muted">{spec.subtitle}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* SECTION 4: FULL-BODY */}
+                    <section id="fullbody" className="py-16 sm:py-24 bg-brand-champagne/30 border-t border-b border-brand-beige/60">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
+                                <span className="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium">Posture & Proportion</span>
+                                <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-charcoal">FULL-BODY</h2>
+                                <p className="text-sm sm:text-base text-brand-muted italic font-serif">
+                                    “Full-length photographs showcasing posture, posing and overall appearance.”
+                                </p>
+                            </div>
+
+                            {/* Exactly 3 Full-Height Portrait Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {photos.fullBody.map((imgUrl, idx) => (
+                                    <div 
+                                        key={idx}
+                                        onClick={() => openLightbox(photos.fullBody, idx, `Full-Body Shot #${idx + 1}`)}
+                                        className="group relative rounded-2xl overflow-hidden bg-brand-beige aspect-[9/16] cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300"
+                                    >
+                                        <img 
+                                            src={imgUrl} 
+                                            alt={`Rita Magdy Gaballah Full Body ${idx + 1}`} 
+                                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                                            onError={(e) => { e.target.src = DEFAULT_IMAGES.fullBody[idx]; }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                                            <div className="text-white">
+                                                <p className="text-[10px] uppercase tracking-widest text-brand-gold font-medium">Full Length #0{idx + 1}</p>
+                                                <p className="font-serif text-base">Height: 164 cm • Weight: 60 kg</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* SECTION 5: NATURAL */}
+                    <section id="natural" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
+                            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-[11px] font-medium tracking-wide">
+                                <i data-lucide="check-circle" className="w-3.5 h-3.5 text-emerald-600"></i>
+                                <span>Authentic & Unfiltered</span>
+                            </div>
+                            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-charcoal">Naim Kerollos Master JEwellers</h2>
+                            <p className="text-sm sm:text-base text-brand-muted italic font-serif">
+                                “Gold and Daimond Modeling.”
+                            </p>
+                        </div>
+
+                        {/* Exactly 3 Natural Unfiltered Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {photos.natural.map((imgUrl, idx) => (
+                                <div key={idx} className="space-y-3">
+                                    <div 
+                                        onClick={() => openLightbox(photos.natural, idx, `Natural Look #${idx + 1}`)}
+                                        className="relative rounded-2xl overflow-hidden bg-brand-beige aspect-[4/5] cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 group border border-brand-beige"
+                                    >
+                                        <img 
+                                            src={imgUrl} 
+                                            alt={`Rita Magdy Gaballah Natural Unfiltered Look ${idx + 1}`} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => { e.target.src = DEFAULT_IMAGES.natural[idx]; }}
+                                        />
+                                        {/* 
+<div className="absolute top-3 right-3 bg-brand-ivory/90 backdrop-blur-sm text-brand-charcoal text-[10px] font-medium tracking-widest px-2.5 py-1 rounded-full border border-brand-gold/30">
+    Jewellery
+</div>
+*/}
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <span className="p-3 rounded-full bg-white text-brand-charcoal shadow-lg">
+                                                <i data-lucide="maximize-2" className="w-5 h-5"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="text-center px-2">
+                                        <p className="text-xs text-brand-muted">Natural lighting & authentic skin texture • Look #{idx + 1}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* SECTION 6: MODELLING CATEGORIES */}
+                    <section id="categories" className="py-16 sm:py-24 bg-brand-champagne/50 border-t border-b border-brand-beige">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center max-w-3xl mx-auto space-y-3 mb-16">
+                                <span className="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium">Campaigns & Collaborations</span>
+                                <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-charcoal">MODELLING OPPORTUNITIES</h2>
+                                <p className="text-sm sm:text-base text-brand-muted italic font-serif">
+                                    “Available for selected photoshoots, advertising campaigns and brand collaborations.”
+                                </p>
+                            </div>
+
+                            {/* 6 Category Cards Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {[
+                                    {
+                                        title: "MAKEUP & BEAUTY",
+                                        icon: "sparkles",
+                                        desc: "Makeup tutorials, cosmetics advertising, beauty products, editorial portraits, and makeup artist collaborations."
+                                    },
+                                    {
+                                        title: "DIAMOND & FINE JEWELLERY",
+                                        icon: "gem",
+                                        desc: "Diamond photography, luxury jewellery, rings, earrings, necklaces, bracelets, and jewellery brand campaigns."
+                                    },
+                                    {
+                                        title: "FITNESS & GYM",
+                                        icon: "activity",
+                                        desc: "Fitness apparel, gym campaigns, sportswear promotions, active lifestyle photography, and fitness brand advertising."
+                                    },
+                                    {
+                                        title: "FOOD & BEVERAGE",
+                                        icon: "utensils",
+                                        desc: "Food advertising, restaurant campaigns, product photography, promotional content, and social media marketing."
+                                    },
+                                    {
+                                        title: "EDUCATIONAL MARKETING",
+                                        icon: "book-open",
+                                        desc: "Educational brand campaigns, learning platforms, school and course promotions, educational technology advertising, and promotional photography."
+                                    },
+                                    {
+                                        title: "COMMERCIAL & LIFESTYLE",
+                                        icon: "camera",
+                                        desc: "Brand campaigns, product promotions, lifestyle photography, fashion content, and commercial advertising."
+                                    }
+                                ].map((cat, idx) => (
+                                    <div key={idx} className="bg-brand-ivory p-8 rounded-2xl border border-brand-beige shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-6 group hover:-translate-y-1">
+                                        <div className="space-y-4">
+                                            <div className="w-12 h-12 rounded-xl bg-brand-champagne flex items-center justify-center text-brand-gold group-hover:bg-brand-gold group-hover:text-brand-ivory transition-colors">
+                                                <i data-lucide={cat.icon} className="w-6 h-6"></i>
+                                            </div>
+                                            <h3 className="font-serif text-xl font-medium tracking-wide text-brand-charcoal">{cat.title}</h3>
+                                            <p className="text-xs leading-relaxed text-brand-muted">{cat.desc}</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => prefillCategory(cat.title)}
+                                            className="w-full py-3 bg-brand-champagne text-brand-charcoal text-[11px] uppercase tracking-widest font-medium rounded-xl hover:bg-brand-gold hover:text-brand-charcoal transition-colors flex items-center justify-center space-x-2"
+                                        >
+                                            <span>ENQUIRE ABOUT A BOOKING</span>
+                                            <i data-lucide="chevron-right" className="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* SECTION 7: PROFESSIONAL RATE CARD */}
+                    <section id="rates" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div className="text-center max-w-3xl mx-auto space-y-3 mb-16">
+                            <span className="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium">Transparent Investment</span>
+                            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-charcoal">MODELLING RATES</h2>
+                            <p className="text-sm sm:text-base text-brand-muted italic font-serif">
+                                “Starting rates for modelling sessions. Final pricing depends on the project scope and agreed usage.”
+                            </p>
+                        </div>
+
+                        {/* Rate Cards Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
+                            
+                            {/* RATE CARD 1: MAKEUP SHOOTING */}
+                            <div className="bg-brand-ivory rounded-3xl p-8 sm:p-10 border-2 border-brand-gold/30 shadow-xl relative overflow-hidden flex flex-col justify-between space-y-8">
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-brand-gold">RATE CARD 1</span>
+                                            <h3 className="font-serif text-2xl sm:text-3xl font-medium text-brand-charcoal mt-1">MAKEUP SHOOTING</h3>
+                                            <p className="text-xs text-brand-muted mt-0.5">Makeup By Sally El-Nagar</p>
+                                        </div>
+                                        <span className="p-3 bg-brand-champagne rounded-2xl text-brand-gold">
+                                            <i data-lucide="sparkles" className="w-6 h-6"></i>
+                                        </span>
+                                    </div>
+
+                                    <div className="p-4 rounded-2xl bg-brand-champagne/60 border border-brand-beige space-y-1">
+                                        <div className="flex items-baseline space-x-2">
+                                            <span className="text-xs text-brand-muted uppercase">Starting at</span>
+                                            <span className="font-serif text-3xl font-bold text-brand-charcoal">EGP 1,000</span>
+                                        </div>
+                                        <p className="text-xs font-medium text-brand-gold">Price range: EGP 1,000–2,500 per session</p>
+                                        <p className="text-[11px] text-brand-muted">Session duration: 2–4 hours</p>
+                                    </div>
+
+                                    <p className="text-xs text-brand-charcoal/80 leading-relaxed italic">
+                                        “Available for makeup artistry sessions, beauty portraits, cosmetics photography, and editorial beauty shoots.”
+                                    </p>
+
+                                    <div className="space-y-2.5 pt-2">
+                                        <p className="text-xs font-semibold uppercase tracking-wider text-brand-charcoal">What's Included:</p>
+                                        <ul className="space-y-2 text-xs text-brand-muted">
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Professional modelling session</span>
+                                            </li>
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Beauty and makeup photography</span>
+                                            </li>
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Suitable for makeup artists, photographers, and beauty brands</span>
+                                            </li>
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Final price confirmed according to session requirements & image usage</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    onClick={() => prefillCategory('Makeup & Beauty')}
+                                    className="w-full py-4 bg-brand-charcoal text-brand-ivory text-xs uppercase tracking-widest font-medium rounded-xl hover:bg-brand-gold hover:text-brand-charcoal transition-all shadow-md"
+                                >
+                                    BOOK A MAKEUP SHOOT
+                                </button>
+                            </div>
+
+                            {/* RATE CARD 2: DIAMOND & JEWELLERY */}
+                            <div className="bg-brand-ivory rounded-3xl p-8 sm:p-10 border-2 border-brand-gold/30 shadow-xl relative overflow-hidden flex flex-col justify-between space-y-8">
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-brand-gold">RATE CARD 2</span>
+                                            <h3 className="font-serif text-2xl sm:text-3xl font-medium text-brand-charcoal mt-1">DIAMOND & JEWELLERY</h3>
+                                            <p className="text-xs text-brand-muted mt-0.5">Diamond & Fine Jewellery Modelling</p>
+                                        </div>
+                                        <span className="p-3 bg-brand-champagne rounded-2xl text-brand-gold">
+                                            <i data-lucide="gem" className="w-6 h-6"></i>
+                                        </span>
+                                    </div>
+
+                                    <div className="p-4 rounded-2xl bg-brand-champagne/60 border border-brand-beige space-y-1">
+                                        <div className="flex items-baseline space-x-2">
+                                            <span className="text-xs text-brand-muted uppercase">Starting at</span>
+                                            <span className="font-serif text-3xl font-bold text-brand-charcoal">EGP 1,500</span>
+                                        </div>
+                                        <p className="text-xs font-medium text-brand-gold">Price range: EGP 1,500–5,000 per session</p>
+                                        <p className="text-[11px] text-brand-muted">Session duration: 3–4 hours</p>
+                                    </div>
+
+                                    <p className="text-xs text-brand-charcoal/80 leading-relaxed italic">
+                                        “Available for diamond photography, fine jewellery campaigns, luxury accessories, and commercial jewellery shoots.”
+                                    </p>
+
+                                    <div className="space-y-2.5 pt-2">
+                                        <p className="text-xs font-semibold uppercase tracking-wider text-brand-charcoal">What's Included:</p>
+                                        <ul className="space-y-2 text-xs text-brand-muted">
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Jewellery and diamond modelling</span>
+                                            </li>
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Luxury product photography</span>
+                                            </li>
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Jewellery advertising and brand campaigns</span>
+                                            </li>
+                                            <li className="flex items-center space-x-2">
+                                                <i data-lucide="check" className="w-4 h-4 text-brand-gold"></i>
+                                                <span>Final price confirmed according to project requirements & image usage</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    onClick={() => prefillCategory('Diamond & Jewellery')}
+                                    className="w-full py-4 bg-brand-charcoal text-brand-ivory text-xs uppercase tracking-widest font-medium rounded-xl hover:bg-brand-gold hover:text-brand-charcoal transition-all shadow-md"
+                                >
+                                    BOOK A JEWELLERY SHOOT
+                                </button>
+                            </div>
+
+                        </div>
+
+                        {/* Clarification Policy Banner */}
+                        <div className="mt-12 max-w-3xl mx-auto p-4 rounded-xl bg-brand-champagne/40 border border-brand-beige text-center space-y-1">
+                            <p className="text-xs font-medium text-brand-charcoal">
+                                <i data-lucide="info" className="w-4 h-4 text-brand-gold inline mr-1.5"></i>
+                                Pricing Policy & Terms
+                            </p>
+                            <p className="text-[11px] text-brand-muted">
+                                All prices are displayed in Egyptian Pounds (EGP). Starting rates represent base fees for local sessions. Final project costs are agreed upon mutually prior to the shoot based on duration, location travel, and asset licensing usage rights.
+                            </p>
+                        </div>
+                    </section>
+
+                    {/* SECTION 8: ABOUT ME */}
+                    <section id="about" className="py-16 sm:py-24 bg-brand-champagne/40 border-t border-b border-brand-beige">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                                
+                                <div className="lg:col-span-7 space-y-6">
+                                    <span className="text-xs uppercase tracking-[0.25em] text-brand-gold font-medium">Model Profile</span>
+                                    <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-brand-charcoal">ABOUT RITA</h2>
+                                    
+                                    <div className="space-y-4 text-sm sm:text-base text-brand-charcoal/85 leading-relaxed font-serif">
+                                        <p>
+                                            “My name is Rita Magdy Gaballah, and I am a beauty and commercial model based in Smouha, Alexandria, Egypt. I am interested in makeup and beauty photography, fine jewellery and diamond campaigns, fitness modelling, food advertising, educational marketing, and commercial brand collaborations.
+                                        </p>
+                                        <p>
+                                            I am building my professional portfolio and looking forward to working with photographers, agencies, creative professionals, and brands. I am ready to relocate to Cairo for suitable modelling opportunities.”
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="lg:col-span-5">
+                                    <div className="bg-brand-ivory p-8 rounded-3xl border border-brand-beige shadow-lg space-y-6">
+                                        <h3 className="font-serif text-xl font-medium border-b border-brand-beige pb-3 text-brand-charcoal">Compact Specification Panel</h3>
+                                        <div className="space-y-3 text-xs">
+                                            <div className="flex justify-between py-1 border-b border-brand-beige/40">
+                                                <span className="text-brand-muted">Full Name</span>
+                                                <span className="font-semibold text-brand-charcoal">Rita Magdy Gaballah</span>
+                                            </div>
+                                            <div className="flex justify-between py-1 border-b border-brand-beige/40">
+                                                <span className="text-brand-muted">Date of Birth</span>
+                                                <span className="font-semibold text-brand-charcoal">Born 26 December 2000</span>
+                                            </div>
+                                            <div className="flex justify-between py-1 border-b border-brand-beige/40">
+                                                <span className="text-brand-muted">Height</span>
+                                                <span className="font-semibold text-brand-charcoal">164 cm</span>
+                                            </div>
+                                            <div className="flex justify-between py-1 border-b border-brand-beige/40">
+                                                <span className="text-brand-muted">Weight</span>
+                                                <span className="font-semibold text-brand-charcoal">60 kg</span>
+                                            </div>
+                                            <div className="flex justify-between py-1 border-b border-brand-beige/40">
+                                                <span className="text-brand-muted">Hair</span>
+                                                <span className="font-semibold text-brand-charcoal">Long blonde hair</span>
+                                            </div>
+                                            <div className="flex justify-between py-1 border-b border-brand-beige/40">
+                                                <span className="text-brand-muted">Primary Location</span>
+                                                <span className="font-semibold text-brand-charcoal">Smouha, Alexandria, Egypt</span>
+                                            </div>
+                                            <div className="flex justify-between py-1 border-b border-brand-beige/40">
+                                                <span className="text-brand-muted">Relocation</span>
+                                                <span className="font-semibold text-brand-gold">Ready to relocate to Cairo</span>
+                                            </div>
+                                            <div className="pt-2">
+                                                <span className="text-brand-muted block mb-1">Modelling Interests:</span>
+                                                <span className="text-[11px] leading-tight text-brand-charcoal font-medium block">
+                                                    Beauty, makeup, diamonds, fine jewellery, fitness, food advertising, educational marketing, commercial campaigns.
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+
+
+                   { /*
+                    
+                    
+                     
+                    
+                   
+                   */}
+                    
+                    
+                   
+
+                  
+
+                    {/* FOOTER */}
+                    <footer className="bg-brand-charcoal text-brand-ivory border-t border-brand-gold/20 pt-16 pb-12">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                                
+                                <div className="md:col-span-6 space-y-4">
+                                    <h4 className="font-serif text-2xl tracking-widest text-brand-gold">RITA MAGDY GABALLAH</h4>
+                                    <p className="text-xs text-brand-beige/70 uppercase tracking-widest">Beauty, Commercial & Jewellery Model</p>
+                                    <p className="text-xs text-brand-beige/50">Smouha, Alexandria, Egypt • Available for Cairo Relocation</p>
+                                </div>
+
+                                <div className="md:col-span-6 flex flex-wrap gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-brand-beige/80">
+                                    <a href="#home" className="hover:text-brand-gold transition-colors">Home</a>
+                                    <a href="#makeup" className="hover:text-brand-gold transition-colors">Makeup Shooting</a>
+                                    <a href="#headshots" className="hover:text-brand-gold transition-colors">Headshots</a>
+                                    <a href="#fullbody" className="hover:text-brand-gold transition-colors">Full-Body</a>
+                                    <a href="#natural" className="hover:text-brand-gold transition-colors">Natural</a>
+                                    <a href="#categories" className="hover:text-brand-gold transition-colors">Categories</a>
+                                    <a href="#rates" className="hover:text-brand-gold transition-colors">Rates</a>
+                                    <a href="#contact" className="hover:text-brand-gold transition-colors">Contact</a>
+                                </div>
+
+                            </div>
+
+                            <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center text-[11px] text-brand-beige/50 space-y-3 sm:space-y-0">
+                                <div>
+                                    © {new Date().getFullYear()} Rita Magdy Gaballah. All Rights Reserved.
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <span>ritamagdy99@gmail.com</span>
+                                    <span>•</span>
+                                    <span>01060542538</span>
+                                    <button onClick={() => setGuideModalOpen(true)} className="text-brand-gold underline ml-2">
+                                        Deployment Guide
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
